@@ -1,8 +1,8 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
 	name='intouch_queryset_csv',
-	version='0.0.1',
+	version='0.0.2',
 	description='Module to export django querysets as csv files',
 	maintainer='James McMahon',
 	maintainer_email='james.mcmahon@intouch-ltd.com',
