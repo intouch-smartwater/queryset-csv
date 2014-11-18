@@ -7,7 +7,7 @@ setup(
 	maintainer='James McMahon',
 	maintainer_email='james.mcmahon@intouch-ltd.com',
 	url='https://bitbucket.org/intouchltd/queryset-csv',
-	packages=['intouch.queryset_csv'],
+	packages=['intouch', 'intouch.queryset_csv'],
 	keywords='django queryset csv',
 	classifiers = [
 		'Development Status :: 3 - Alpha',
