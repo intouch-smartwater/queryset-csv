@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
 	name='intouch_queryset_csv',
-	version='0.0.3',
+	version='0.1.1',
 	description='Module to export django querysets as csv files',
 	maintainer='James McMahon',
 	maintainer_email='james.mcmahon@intouch-ltd.com',
