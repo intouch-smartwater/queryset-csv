@@ -1,0 +1,4 @@
+syntax: glob
+.pydevproject
+python3*
+.project
