@@ -7,8 +7,12 @@ Queryset CSV is a simple module to allow Django Querysets to be exported as CSV 
 ------------
 Installation
 ------------
+
 ::
 	pip install intouch-queryset-csv
+	
+Then add the app to your installed apps ::
+	intouch.queryset_csv
 
 --------------------------------------------------------------------
 Why create this code rather than use an existing CSV export project?
