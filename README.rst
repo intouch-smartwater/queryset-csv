@@ -38,10 +38,10 @@ Admin Action
 ^^^^^^^^^^^^
 
 An action is provided for the Django admin site. There are 3 ways of including it:
-#. The function `export_model_as_csv` can be added to your custom admin class's actions
-#. The `CsvExporterAdmin` class can be inherited to provide the action
-#. Setting `ADMIN_ACTION_AVAILABLE=True` in your django settings module will make the action
-available to all registered admin classes.
+
+#. The function :code:`export_model_as_csv` can be added to your custom admin class's actions
+#. The :code:`CsvExporterAdmin` class can be inherited to provide the action
+#. Setting :code:`ADMIN_ACTION_AVAILABLE=True` in your django settings module will make the action available to all registered admin classes.
 	
 The action will simply export all objects of the selected model to csv (as a stream)  
 
