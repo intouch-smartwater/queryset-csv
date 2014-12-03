@@ -84,3 +84,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CSV_EXPORT_ADMIN_ACTION_AVAILABLE=True
+
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)
