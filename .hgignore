@@ -2,3 +2,4 @@ syntax: glob
 .pydevproject
 python3*
 .project
+*__pycache__*
