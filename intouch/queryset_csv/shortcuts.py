@@ -8,6 +8,7 @@ def csv_write_to_file(file, headers, data):
 	'''
 	Write a csv to a given file-like stream target. Returns the original stream.	
 	If given a file name, it will automatically open a file stream with mode in replace mode.
+	User of this function must close the returned file handler manually or use with a "with" statement.
 	'''
 	if isinstance(file, str):
 		file = open(file, 'w', newline='')
