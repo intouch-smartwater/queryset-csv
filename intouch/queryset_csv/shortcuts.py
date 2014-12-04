@@ -6,7 +6,9 @@ from django.http.response import HttpResponse, StreamingHttpResponse
 
 def write_csv(file, headers, data):
 	'''
-	Write csv data to a file-like object and return the file-like
+	Write csv data to a file-like object and return the file-like object.
+	If the object is a file, it should be opened in text mode with newline set to ''
+	(as csv handles newlines anyway)
 	'''
 	writer = csv.writer(file, csv.excel)
 	if headers:
