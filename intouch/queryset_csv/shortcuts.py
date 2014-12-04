@@ -4,22 +4,26 @@ from django.db.models.query import ValuesQuerySet, QuerySet
 from django.http.response import HttpResponse, StreamingHttpResponse
 
 
-def csv_response(filename, headers, data):
+def write_csv(file, headers, data):
 	'''
-	Create and return a csv as specified in the parameters
+	Write csv data to a file-like object and return the file-like
 	'''
-	response = HttpResponse(content_type='text/csv')
-	response['Content-Disposition'] = 'attachment; filename=%s' % filename
-	writer = csv.writer(response, csv.excel)
-	response.write('\ufeff'.encode('utf8')) # BOM (Excel needs this to open UTF-8 file properly)
-
+	writer = csv.writer(file, csv.excel)
 	if headers:
 		writer.writerow(headers)
 
 	for row in data:
 		writer.writerow(row)
 
-	return response
+	return file
+
+def csv_response(filename, headers, data):
+	'''
+	Create and return a csv as specified in the parameters
+	'''
+	response = HttpResponse(content_type='text/csv')
+	response['Content-Disposition'] = 'attachment; filename=%s' % filename
+	return write_csv(response, headers, data)
 
 def csv_stream(filename, headers, data):
 	'''
@@ -48,7 +52,6 @@ def csv_stream(filename, headers, data):
 		for row in data:
 			yield row
 		
-	# TODO BOM in streaming
 	pseudo_buffer = Echo()
 	writer = csv.writer(pseudo_buffer, csv.excel)
 	response = StreamingHttpResponse(
