@@ -14,5 +14,5 @@ class QuerysetCSVAppConfig(AppConfig):
     verbose_name = 'Queryset CSV'
     
     def ready(self):
-        if settings.CSV_EXPORT_ADMIN_ACTION_AVAILABLE:
+        if getattr(settings, 'CSV_EXPORT_ADMIN_ACTION_AVAILABLE', False):
             admin.site.add_action(export_selection_as_csv)
