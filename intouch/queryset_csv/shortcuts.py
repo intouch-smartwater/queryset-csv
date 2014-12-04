@@ -4,13 +4,16 @@ from django.db.models.query import ValuesQuerySet, QuerySet
 from django.http.response import HttpResponse, StreamingHttpResponse
 
 
-def write_csv(file, headers, data):
+def csv_write_to_file(file, headers, data):
 	'''
-	Write csv data to a file-like object and return the file-like object.
-	If the object is a file, it should be opened in text mode with newline set to ''
-	(as csv handles newlines anyway)
+	Write a csv to a given file-like stream target. Returns the original stream.	
+	If given a file name, it will automatically open a file stream with mode in replace mode.
 	'''
+	if isinstance(file, str):
+		file = open(file, 'w', newline='')
+
 	writer = csv.writer(file, csv.excel)
+
 	if headers:
 		writer.writerow(headers)
 
@@ -25,7 +28,10 @@ def csv_response(filename, headers, data):
 	'''
 	response = HttpResponse(content_type='text/csv')
 	response['Content-Disposition'] = 'attachment; filename=%s' % filename
-	return write_csv(response, headers, data)
+	
+	# response is a file-like object, and can be used as such.
+	return csv_write_to_file(response, headers, data)
+	
 
 def csv_stream(filename, headers, data):
 	'''
@@ -102,3 +108,4 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
 		return csv_response(filename, verbose_names, data())
 	else:
 		return csv_stream(filename, verbose_names, data())
+
