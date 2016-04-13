@@ -1,6 +1,6 @@
 import csv
 
-from django.db.models.query import ValuesQuerySet, QuerySet
+from django.db.models.query import QuerySet
 from django.http.response import HttpResponse, StreamingHttpResponse
 
 
@@ -74,15 +74,10 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
 	'''
 	Converts the given queryset to a csv and returns an HttpResponse
 	'''
-	# Querysets do not have a reference to the field names list,
-	# however, ValuesQuerySets do. If this is not a valuesQuerySet
-	# the names must be extracted by using values() to create
-	# the correct type of object to get the names
-	
+    # Extract the names must using values() to create the correct type of
+    # object.
 	v_queryset = None
-	if isinstance(queryset, ValuesQuerySet):
-		v_queryset = queryset
-	elif isinstance(queryset, QuerySet):
+	if isinstance(queryset, QuerySet):
 		v_queryset = queryset.values()
 	else:
 		raise TypeError('queryset must be a django Queryset')
