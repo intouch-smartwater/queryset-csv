@@ -1,9 +1,10 @@
 import django
 from django.core.management.color import no_style
 from django.db import models, connection
+from django.db import models
 from django.test import TestCase
 from django.test.client import Client
-
+from intouch.queryset_csv.shortcuts import queryset_as_csv_response
 django.setup()
 
 class QuerysetCsvTests(TestCase):
@@ -12,23 +13,34 @@ class QuerysetCsvTests(TestCase):
         '''
         Basic django model for use with this test case
         '''
+        class Meta:
+            app_label = "queryset_csv.tests"
+        
+        number = models.IntegerField()
     
     def setUp(self):
         self._style = no_style()
-        sql, _ = connection.creation.sql_create_model(self.TestModel, self._style)
-        self._cursor = connection.cursor()
-        for statement in sql:
-            self._cursor.execute(statement)
+        with connection.schema_editor() as schema_editor:
+            schema_editor.create_model(self.TestModel)
+
     
     
     def tearDown(self):
-        sql = connection.creation.sql_destroy_model(self.TestModel, (), self._style)
-        for statement in sql:
-            self._cursor.execute(statement)
+        with connection.schema_editor() as schema_editor:
+            schema_editor.delete_model(self.TestModel)
             
     
     def test_queryset_csv_response(self):
-        for _ in range(0, 10):
-            self.TestModel.objects.create()
-        client = Client()
+        for i in range(0, 10):
+            self.TestModel.objects.create(number=i)
+            
+        expected = b"""Id,Number\r\n1,0\r\n2,1\r\n3,2\r\n4,3\r\n5,4\r\n6,5\r\n7,6\r\n8,7\r\n9,8\r\n10,9\r\n"""
+        expected_filename = "some_file.csv"
+        
+        response = queryset_as_csv_response(self.TestModel.objects.all(), expected_filename)
+        self.assertEqual(expected, response.getvalue(), "Comparing response body (as bytes)")
+        self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
+        self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
+
+
         
