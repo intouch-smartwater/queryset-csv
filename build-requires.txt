@@ -1,0 +1,4 @@
+django>=1.7
+pip>=1.4
+wheel>=0.9
+setuptools>=0.21
