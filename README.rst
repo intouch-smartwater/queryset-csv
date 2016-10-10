@@ -54,3 +54,8 @@ Why create this code rather than use an existing CSV export project?
 #. Simplicity - This package has no dependencies other than django itself, and the requirements are to be kept to a minimum in future versions (preferably solely django). It is also designed to require as little effort as possible to use.
 #. Currency - The package is written and tested using the latest versions of Python and Django. While it may work with older versions, no special effort will be expended to force compatibility with old versions.
 
+---------------
+Tested Versions
+---------------
+
+Django versions 1.7-1.10 should be supported, Python 3 versions supported as per the Django releases.
