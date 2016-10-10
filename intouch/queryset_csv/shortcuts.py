@@ -83,7 +83,10 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
         raise TypeError('queryset must be a django Queryset')
     
     model = v_queryset.model
-    field_names = v_queryset.query.values_select
+    try:
+        field_names = v_queryset.query.values_select
+    except AttributeError:
+        field_names = v_queryset.field_names
 
     
     # Use the model reference to get the verbose names of fields

@@ -4,7 +4,9 @@ from django.db import models, connection
 from django.db import models
 from django.test import TestCase
 from django.test.client import Client
+from django.conf import settings
 from intouch.queryset_csv.shortcuts import queryset_as_csv_response
+
 django.setup()
 
 class QuerysetCsvTests(TestCase):
@@ -38,7 +40,7 @@ class QuerysetCsvTests(TestCase):
         expected_filename = "some_file.csv"
         
         response = queryset_as_csv_response(self.TestModel.objects.all(), expected_filename)
-        self.assertEqual(expected, response.getvalue(), "Comparing response body (as bytes)")
+        self.assertEqual(expected, response.content, "Comparing response body (as bytes)")
         self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
         self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
 
