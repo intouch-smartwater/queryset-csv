@@ -11,3 +11,5 @@ env/*
 .eggs/*
 junit-*.xml
 *.sqlite3
+build/
+dist/
