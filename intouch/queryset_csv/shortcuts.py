@@ -2,7 +2,7 @@ import csv
 
 from django.db.models.query import QuerySet
 from django.http.response import HttpResponse, StreamingHttpResponse
-
+from datetime import datetime
 
 def csv_write_to_file(file, headers, data):
     '''
@@ -88,20 +88,37 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
     except AttributeError:
         field_names = v_queryset.field_names
 
+    annotations = []
+    try:
+        if v_queryset.query._annotations is not None:
+            annotations = list(v_queryset.query._annotations.keys())
+    except:
+        pass
+
+    try:
+        if v_queryset.query._aggregates is not None:
+            annotations = list(v_queryset.query._aggregates.keys())
+    except:
+        pass
     
     # Use the model reference to get the verbose names of fields
     verbose_names = []
     for field in field_names:
         verbose_names.append(model._meta.get_field(field).verbose_name.title())
+
+    verbose_names.extend(annotations)
     
     # use the model name if no filename is given
     if filename is None:
         filename = "%s.csv" % model._meta.model_name.title()
         
-    
+    def format(val):
+        if type(val) == datetime:
+            return val.strftime("%d-%m-%Y %H:%M:%S")
+        return val
     def data():
         for obj in v_queryset:
-            yield [obj[field] for field in field_names] #yield one row of the queryset at a time
+            yield [format(obj[field]) for field in field_names + annotations] #yield one row of the queryset at a time
     
     if not is_stream:
         return csv_response(filename, verbose_names, data())
