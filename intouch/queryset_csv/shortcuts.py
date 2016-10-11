@@ -3,6 +3,7 @@ import csv
 from django.db.models.query import QuerySet
 from django.http.response import HttpResponse, StreamingHttpResponse
 from datetime import datetime
+from django.conf import settings
 
 def csv_write_to_file(file, headers, data):
     '''
@@ -114,7 +115,7 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
         
     def format(val):
         if type(val) == datetime:
-            return val.strftime("%d-%m-%Y %H:%M:%S")
+            return val.strftime(getattr(settings, 'QUERYSET_CSV_DATE_FORMAT', "%d-%m-%Y %H:%M:%S"))
         return val
     def data():
         for obj in v_queryset:
