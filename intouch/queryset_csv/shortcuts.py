@@ -52,20 +52,20 @@ def csv_stream(filename, headers, data):
         def write(self, value):
             return value
     
-    def stream(headers, data):
+    def stream(headers, data, writer):
         '''
         Generator to yeild first the headers then each data row
         data may also be generated, allowing the stream to take up little memory
         '''
         if headers:
-            yield headers
+            yield writer.writerow(headers)
         for row in data:
-            yield row
-        
+            yield writer.writerow(row)
+     
     pseudo_buffer = Echo()
     writer = csv.writer(pseudo_buffer, csv.excel)
     response = StreamingHttpResponse(
-        (writer.writerow(row) for row in stream(headers, data)),
+        stream(headers, data, writer),
         content_type='text/csv'
     )
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
