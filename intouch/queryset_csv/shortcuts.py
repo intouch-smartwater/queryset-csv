@@ -4,6 +4,7 @@ from django.db.models.query import QuerySet
 from django.http.response import HttpResponse, StreamingHttpResponse
 from datetime import datetime
 from django.conf import settings
+from django.core.paginator import Paginator
 
 def csv_write_to_file(file, headers, data):
     '''
@@ -118,8 +119,11 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
             return val.strftime(getattr(settings, 'QUERYSET_CSV_DATE_FORMAT', "%d-%m-%Y %H:%M:%S"))
         return val
     def data():
-        for obj in v_queryset.iterator():
-            yield [format(obj[field]) for field in field_names + annotations] #yield one row of the queryset at a time
+        # TODO - replace this with a server-side-cursor implementation once this is supported
+        paginator = Paginator(v_queryset, 30000)
+        for page_num in paginator.page_range:
+            for obj in paginator.page(page_num).object_list.iterator():
+                yield [format(obj[field]) for field in field_names + annotations] #yield one row of the queryset at a time
     
     if not is_stream:
         return csv_response(filename, verbose_names, data())
