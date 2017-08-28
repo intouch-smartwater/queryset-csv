@@ -12,9 +12,8 @@ class ModelAsCsvView(View):
         
         if self.has_export_permission(request.user, Model):
             return queryset_as_csv_response(Model.objects.all(), is_stream=True)
-        else :
+        else:
             raise PermissionDenied
         
-        
     def has_export_permission(self, user, Model):
-        return True # TODO check for permission
+        return True  # TODO check for permission

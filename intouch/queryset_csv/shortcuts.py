@@ -6,6 +6,15 @@ from datetime import datetime
 from django.conf import settings
 from django.core.paginator import Paginator
 
+
+def get_verbose_name(model, field_name):
+    field_path = str.split(field_name, '__')
+    field = model._meta.get_field(field_path.pop(0))
+    if field_path and field.is_relation:
+        return get_verbose_name(field.related_model, field_path[0])
+    return field.verbose_name.title()
+
+
 def csv_write_to_file(file, headers, data):
     '''
     Write a csv to a given file-like stream target. Returns the original stream.    
@@ -24,6 +33,7 @@ def csv_write_to_file(file, headers, data):
         writer.writerow(row)
 
     return file
+
 
 def csv_response(filename, headers, data):
     '''
@@ -72,6 +82,7 @@ def csv_stream(filename, headers, data):
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     return response
 
+
 def queryset_as_csv_response(queryset, filename=None, is_stream=False):
     '''
     Converts the given queryset to a csv and returns an HttpResponse
@@ -80,7 +91,10 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
     # object.
     v_queryset = None
     if isinstance(queryset, QuerySet):
-        v_queryset = queryset.values()
+        if queryset.query.values_select:
+            v_queryset = queryset
+        else:
+            v_queryset = queryset.values()
     else:
         raise TypeError('queryset must be a django Queryset')
     
@@ -90,12 +104,7 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
     except AttributeError:
         field_names = v_queryset.field_names
 
-    annotations = []
-    try:
-        if v_queryset.query._annotations is not None:
-            annotations = list(v_queryset.query._annotations.keys())
-    except:
-        pass
+    annotations = v_queryset.query.annotations().keys()
 
     try:
         if v_queryset.query._aggregates is not None:
@@ -106,7 +115,7 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
     # Use the model reference to get the verbose names of fields
     verbose_names = []
     for field in field_names:
-        verbose_names.append(model._meta.get_field(field).verbose_name.title())
+        verbose_names.append(get_verbose_name(model, field))
 
     verbose_names.extend(annotations)
     
@@ -118,6 +127,7 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
         if type(val) == datetime:
             return val.strftime(getattr(settings, 'QUERYSET_CSV_DATE_FORMAT', "%d-%m-%Y %H:%M:%S"))
         return val
+
     def data():
         # TODO - replace this with a server-side-cursor implementation once this is supported
         paginator = Paginator(v_queryset, 30000)
