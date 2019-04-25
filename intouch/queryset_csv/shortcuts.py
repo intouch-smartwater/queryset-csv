@@ -140,7 +140,11 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
         paginator = Paginator(v_queryset, 30000)
         for page_num in paginator.page_range:
             for obj in paginator.page(page_num).object_list.iterator():
-                yield [format(obj[field]) for field in field_names + annotations] #yield one row of the queryset at a time
+                #yield one row of the queryset at a time
+                if type(obj) in (tuple,list):
+                    yield [format(value) for value in obj] 
+                else:
+                    yield [format(obj[field]) for field in field_names + annotations]
     
     if not is_stream:
         return csv_response(filename, verbose_names, data())
