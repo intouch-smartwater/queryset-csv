@@ -64,4 +64,4 @@ Settings
 Tested Versions
 ---------------
 
-Django versions 1.7-1.10 should be supported, Python 3 versions supported as per the Django releases.
+Django versions 1.11-2.2 should be supported, Python 3 versions supported as per the Django releases.
