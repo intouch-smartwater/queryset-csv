@@ -4,10 +4,14 @@ Queryset CSV
 
 .. image:: https://travis-ci.org/intouch-smartwater/queryset-csv.svg?branch=master
     :target: https://travis-ci.org/intouch-smartwater/queryset-csv
+    
 .. image:: https://img.shields.io/github/license/intouch-smartwater/queryset-csv.svg
-   :alt: GitHub
+    :target: https://github.com/intouch-smartwater/queryset-csv
+    :alt: GitHub
+    
 .. image:: https://img.shields.io/pypi/v/intouch_queryset_csv.svg
-   :alt: PyPI
+    :target: https://pypi.org/project/intouch-queryset-csv/
+    :alt: PyPI
 
 Queryset CSV is a simple module to allow Django Querysets to be exported as CSV files.
 
