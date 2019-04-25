@@ -104,6 +104,8 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
     except AttributeError:
         field_names = v_queryset.field_names
 
+    field_names = list(field_names)
+
     annotations = []
     try:
         if v_queryset.query._annotations is not None:
