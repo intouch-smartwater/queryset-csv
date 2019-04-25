@@ -1,0 +1,14 @@
+*.egg-info/*
+*.pyc
+*~
+.pydevproject
+python3*
+.project
+*__pycache__*
+.tox/*
+env/*
+.eggs/*
+junit-*.xml
+*.sqlite3
+build/
+dist/
