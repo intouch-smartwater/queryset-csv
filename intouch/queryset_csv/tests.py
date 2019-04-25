@@ -2,14 +2,14 @@ import django
 from django.core.management.color import no_style
 from django.db import models, connection
 from django.db import models
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.test.client import Client
 from django.conf import settings
 from intouch.queryset_csv.shortcuts import queryset_as_csv_response
 
 django.setup()
 
-class QuerysetCsvTests(TestCase):
+class QuerysetCsvTests(TransactionTestCase):
     
     class TestModel(models.Model):
         '''
