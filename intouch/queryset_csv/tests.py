@@ -118,3 +118,78 @@ class QuerysetCsvTests(TransactionTestCase):
         self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
         self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
 
+
+    def test_queryset_csv_response_values_one_field_with_only(self):
+        for i in range(0, 10):
+            self.TestModel.objects.create(number=i)
+            
+        expected = b"""Id\r\n1\r\n2\r\n3\r\n4\r\n5\r\n6\r\n7\r\n8\r\n9\r\n10\r\n"""
+        expected_filename = "some_file.csv"
+        
+        response = queryset_as_csv_response(self.TestModel.objects.all().only('number').values('id'), expected_filename)
+        self.assertEqual(expected, response.content, "Comparing response body (as bytes)")
+        self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
+        self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
+
+    def test_queryset_csv_response_values_two_fields_with_only(self):
+        for i in range(0, 10):
+            self.TestModel.objects.create(number=i)
+            
+        expected = b"""Id,Number\r\n1,0\r\n2,1\r\n3,2\r\n4,3\r\n5,4\r\n6,5\r\n7,6\r\n8,7\r\n9,8\r\n10,9\r\n"""
+        expected_filename = "some_file.csv"
+        
+        response = queryset_as_csv_response(self.TestModel.objects.all().only('number').values('id', 'number'), expected_filename)
+        self.assertEqual(expected, response.content, "Comparing response body (as bytes)")
+        self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
+        self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
+
+    def test_queryset_csv_response_values_ordering_with_only(self):
+        for i in range(0, 10):
+            self.TestModel.objects.create(number=i)
+            
+        expected = b"""Number,Id\r\n0,1\r\n1,2\r\n2,3\r\n3,4\r\n4,5\r\n5,6\r\n6,7\r\n7,8\r\n8,9\r\n9,10\r\n"""
+        expected_filename = "some_file.csv"
+        
+        response = queryset_as_csv_response(self.TestModel.objects.all().only('number').values('number', 'id'), expected_filename)
+        self.assertEqual(expected, response.content, "Comparing response body (as bytes)")
+        self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
+        self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
+        
+
+    def test_queryset_csv_response_values_one_field_with_defer(self):
+        for i in range(0, 10):
+            self.TestModel.objects.create(number=i)
+            
+        expected = b"""Id\r\n1\r\n2\r\n3\r\n4\r\n5\r\n6\r\n7\r\n8\r\n9\r\n10\r\n"""
+        expected_filename = "some_file.csv"
+        
+
+        response = queryset_as_csv_response(self.TestModel.objects.all().defer('id', 'number').values('id'), expected_filename)
+        self.assertEqual(expected, response.content, "Comparing response body (as bytes)")
+        self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
+        self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
+
+    def test_queryset_csv_response_values_two_fields_with_defer(self):
+        for i in range(0, 10):
+            self.TestModel.objects.create(number=i)
+            
+        expected = b"""Id,Number\r\n1,0\r\n2,1\r\n3,2\r\n4,3\r\n5,4\r\n6,5\r\n7,6\r\n8,7\r\n9,8\r\n10,9\r\n"""
+        expected_filename = "some_file.csv"
+        
+        response = queryset_as_csv_response(self.TestModel.objects.all().defer('number').values('id', 'number'), expected_filename)
+        self.assertEqual(expected, response.content, "Comparing response body (as bytes)")
+        self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
+        self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
+
+    def test_queryset_csv_response_values_ordering_with_defer(self):
+        for i in range(0, 10):
+            self.TestModel.objects.create(number=i)
+            
+        expected = b"""Number,Id\r\n0,1\r\n1,2\r\n2,3\r\n3,4\r\n4,5\r\n5,6\r\n6,7\r\n7,8\r\n8,9\r\n9,10\r\n"""
+        expected_filename = "some_file.csv"
+        
+        response = queryset_as_csv_response(self.TestModel.objects.all().defer('number').values('number', 'id'), expected_filename)
+        self.assertEqual(expected, response.content, "Comparing response body (as bytes)")
+        self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
+        self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
+        
