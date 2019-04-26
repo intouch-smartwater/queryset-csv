@@ -45,6 +45,12 @@ whether the file is to be streamed. It returns an HTTPResponse object, so
 should be called at the end of a view function to offer the download to the
 client.
 
+When using this method, field selections made using `values()` and
+`values_list()` are respected - only selected fields will appear, and they
+will appear in the order they are specified. Querysets using `defer()` or
+`only()` will still return all fields, but they will be lazily loaded as the
+output file is generated.
+
 ^^^^^^^^^^^^
 Admin Action
 ^^^^^^^^^^^^
