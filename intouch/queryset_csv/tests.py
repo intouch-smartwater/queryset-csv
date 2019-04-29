@@ -1,3 +1,4 @@
+import datetime
 import django
 from django.core.management.color import no_style
 from django.db import models, connection
@@ -20,17 +21,30 @@ class QuerysetCsvTests(TransactionTestCase):
         
         number = models.IntegerField()
     
+    class ComplexTestModel(models.Model):
+        '''
+        Basic django model for use with this test case
+        '''
+        class Meta:
+            app_label = "queryset_csv.tests"
+        
+        integer = models.IntegerField()
+        char = models.CharField(max_length=32)
+        datetime = models.DateTimeField()
+    
     def setUp(self):
         self._style = no_style()
         with connection.schema_editor() as schema_editor:
             schema_editor.create_model(self.IntegerTestModel)
+            schema_editor.create_model(self.ComplexTestModel)
 
     
     
     def tearDown(self):
         with connection.schema_editor() as schema_editor:
             schema_editor.delete_model(self.IntegerTestModel)
-            
+            schema_editor.delete_model(self.ComplexTestModel)
+
     
     def test_queryset_csv_response(self):
         for i in range(0, 10):
@@ -192,4 +206,17 @@ class QuerysetCsvTests(TransactionTestCase):
         self.assertEqual(expected, response.content, "Comparing response body (as bytes)")
         self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
         self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
+ 
+
+    def test_queryset_csv_response_complex_values(self):
+        for i in range(0, 2):
+            self.ComplexTestModel.objects.create(integer=i, char='abc\nde,./[];#"\'',datetime=datetime.datetime(2000,1,2))
+
+        expected = b'''Id,Integer,Char,Datetime\r\n1,0,"abc\nde,./[];#""\'",02-01-2000 00:00:00\r\n2,1,"abc\nde,./[];#""\'",02-01-2000 00:00:00\r\n'''
+        expected_filename = "other_file.csv"
         
+        response = queryset_as_csv_response(self.ComplexTestModel.objects.all(), expected_filename)
+        self.assertEqual(expected, response.content, "Comparing response body (as bytes)")
+        self.assertEqual("text/csv", response["Content-Type"], "Ensure content type is csv")
+        self.assertEqual("attachment; filename={}".format(expected_filename), response["content-disposition"], "Ensuring filename is correctly propogated")
+       
