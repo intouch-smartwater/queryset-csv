@@ -4,6 +4,7 @@ from intouch.queryset_csv.shortcuts import queryset_as_csv_response
 def export_selection_as_csv(admin, request, queryset):
     return queryset_as_csv_response(queryset, is_stream=True)
 
+
 export_selection_as_csv.short_description = 'Export Selection as CSV'
 
 
