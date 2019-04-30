@@ -17,7 +17,7 @@ def get_verbose_name(model, field_name):
 
 def csv_write_to_file(file, headers, data):
     '''
-    Write a csv to a given file-like stream target. Returns the original stream.    
+    Write a csv to a given file-like stream target. Returns the original stream.
     If given a file name, it will automatically open a file stream with mode in replace mode.
     User of this function must close the returned file handler manually or use with a "with" statement.
     '''
@@ -41,10 +41,10 @@ def csv_response(filename, headers, data):
     '''
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
-    
+
     # response is a file-like object, and can be used as such.
     return csv_write_to_file(response, headers, data)
-    
+
 
 def csv_stream(filename, headers, data):
     '''
@@ -62,7 +62,7 @@ def csv_stream(filename, headers, data):
         '''
         def write(self, value):
             return value
-    
+
     def stream(headers, data, writer):
         '''
         Generator to yeild first the headers then each data row
@@ -72,7 +72,7 @@ def csv_stream(filename, headers, data):
             yield writer.writerow(headers)
         for row in data:
             yield writer.writerow(row)
-     
+
     pseudo_buffer = Echo()
     writer = csv.writer(pseudo_buffer, csv.excel)
     response = StreamingHttpResponse(
@@ -97,7 +97,7 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
             v_queryset = queryset.values()
     else:
         raise TypeError('queryset must be a django Queryset')
-    
+
     model = v_queryset.model
     try:
         field_names = v_queryset.query.values_select
@@ -118,18 +118,18 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
             annotations = list(v_queryset.query._aggregates.keys())
     except:
         pass
-    
+
     # Use the model reference to get the verbose names of fields
     verbose_names = []
     for field in field_names:
         verbose_names.append(get_verbose_name(model, field))
 
     verbose_names.extend(annotations)
-    
+
     # use the model name if no filename is given
     if filename is None:
         filename = "%s.csv" % model._meta.model_name.title()
-        
+
     def format(val):
         if type(val) == datetime:
             return val.strftime(getattr(settings, 'QUERYSET_CSV_DATE_FORMAT', "%d-%m-%Y %H:%M:%S"))
@@ -140,14 +140,13 @@ def queryset_as_csv_response(queryset, filename=None, is_stream=False):
         paginator = Paginator(v_queryset, 30000)
         for page_num in paginator.page_range:
             for obj in paginator.page(page_num).object_list.iterator():
-                #yield one row of the queryset at a time
-                if type(obj) in (tuple,list):
-                    yield [format(value) for value in obj] 
+                # yield one row of the queryset at a time
+                if type(obj) in (tuple, list):
+                    yield [format(value) for value in obj]
                 else:
                     yield [format(obj[field]) for field in field_names + annotations]
-    
+
     if not is_stream:
         return csv_response(filename, verbose_names, data())
     else:
         return csv_stream(filename, verbose_names, data())
-
